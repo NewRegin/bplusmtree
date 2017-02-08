@@ -1,4 +1,4 @@
-// package bmTree 
+// package bplusmtree 
 
 // import (
 	

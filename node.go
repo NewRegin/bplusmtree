@@ -1,4 +1,4 @@
-package bplustree
+package bplusmtree
 
 const (
 	// 叶子节点最大元素存储数目

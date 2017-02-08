@@ -1,4 +1,4 @@
-package bplustree
+package bplusmtree
 
 // B+ 树数据结构；限制只能存储正数
 type BTree struct {
