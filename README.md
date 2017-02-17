@@ -16,7 +16,31 @@
 ```
 
 ### 数据结构定义
+#### 建议
+	1.所有数据结构应该存储在 kv 对里，整个结构对外表现为一个 map，B+ Tree 是为了减少 map 上 key 的访问次数和封锁粒度而存在的
+	2.允许有序扫描
+#### 定义
+```
+	// B+ 树数据结构；限制只能存储正数
+	type BTree map[int]node
 
+```
 ### 核心接口定义
+```
+	// 接口设计
+	type node interface {
+		// 确定元素在节点中的位置
+		find(key int) (int, bool)
+		// 获取父亲节点
+		parent() *interiorNode
+		// 设置父亲节点
+		setParent(*interiorNode)
+		// 是否达到最大数目限制
+		full() bool
+		// 元素数目统计	
+		countNum() int
+}
+
+```
 
 <!--### 与普通实现方案的对比-->

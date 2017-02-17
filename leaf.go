@@ -32,11 +32,6 @@ func newLeafNode(p *interiorNode) *leafNode {
 	}
 }
 
-// find finds the index of a key in the leaf node.
-// If the key exists in the node, it returns the index and true.
-// If the key does not exist in the node, it returns index to
-// insert the key (the index of the smallest key in the node that larger
-// than the given key) and false.
 func (l *leafNode) find(key int) (int, bool) {
 	c := func(i int) bool {
 		return l.kvs[i].key >= key
@@ -52,13 +47,12 @@ func (l *leafNode) find(key int) (int, bool) {
 }
 
 // insert
-func (l *leafNode) insert(key int, value string) (int, bool) {
+func (l *leafNode) insert(key int, value string) (int, *leafNode, bool) {
 	i, ok := l.find(key)
 
 	if ok {
-		//log.Println("insert.replace", i)
 		l.kvs[i].value = value
-		return 0, false
+		return 0, nil, false
 	}
 	// 判断叶子节点是否已经填满
 	if !l.full() {
@@ -66,7 +60,7 @@ func (l *leafNode) insert(key int, value string) (int, bool) {
 		l.kvs[i].key = key
 		l.kvs[i].value = value
 		l.count++
-		return 0, false
+		return 0, nil, false
 	}
 	// 获取分裂出新的节点
 	next := l.split()
@@ -77,7 +71,7 @@ func (l *leafNode) insert(key int, value string) (int, bool) {
 		next.insert(key, value)
 	}
 	// 返回分裂节点的第一个key
-	return next.kvs[0].key, true
+	return next.kvs[0].key, next, true
 }
 
 // 叶子节点分裂过程
@@ -92,6 +86,8 @@ func (l *leafNode) split() *leafNode {
 	// 重新设置原始节点的参数
 	l.count = l.count/2 + 1
 	l.next = next
+	// // 设置右节点在 map 中的 key
+	// next.setKey(next.kvs[0].key)
 	// 返回右节点指针
 	return next
 }
@@ -101,3 +97,6 @@ func (l *leafNode) full() bool { return l.count == MaxKV }
 func (l *leafNode) parent() *interiorNode { return l.p }
 // 设置父中间节点
 func (l *leafNode) setParent(p *interiorNode) { l.p = p }
+
+func (l *leafNode) countNum() int { return l.count }
+

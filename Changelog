@@ -1,3 +1,6 @@
 VERSION 0.1.0
-* 一般化 B+ 树实现
+*[feature] 一般化 B+ 树实现
 
+VERSION 0.2.0
+*[refactor] B+ 树结构封装在 map 里
+ *[feature] 实现有序扫描

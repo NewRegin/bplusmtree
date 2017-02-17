@@ -46,6 +46,9 @@ func newInteriorNode(p *interiorNode, largestChild node) *interiorNode {
 	}
 	return i
 }
+
+
+
 // 从该中间节点找到 key 元素应该存储的位置
 func (in *interiorNode) find(key int) (int, bool) {
 	// 定义查询方法，这里只需要 ">"
@@ -61,6 +64,9 @@ func (in *interiorNode) full() bool { return in.count == MaxKC }
 func (in *interiorNode) parent() *interiorNode { return in.p }
 // 设置中间节点的父亲节点
 func (in *interiorNode) setParent(p *interiorNode) { in.p = p }
+
+func (in *interiorNode) countNum() int { return in.count }
+
 
 // 插入中间节点
 func (in *interiorNode) insert(key int, child node) (int, *interiorNode, bool) {

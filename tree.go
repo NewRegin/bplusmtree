@@ -1,45 +1,75 @@
 package bplusmtree
 
+import (
+)
+
 // B+ 树数据结构；限制只能存储正数
-type BTree struct {
-	root     *interiorNode // 根节点
-	first    *leafNode // 最左侧的叶子节点
-	leaf     int // 叶子数目
-	interior int // 中间节点数目
-	height   int // 树的高度
-}
+type BTree map[int]node
+
 
 // 创建自由一个父亲节点和叶子节点的 B+ 树
 func newBTree() *BTree {
+	bt := BTree{}
 	leaf := newLeafNode(nil)
 	r := newInteriorNode(nil, leaf)
 	leaf.p = r
-	return &BTree{
-		root:     r,
-		first:    leaf,
-		leaf:     1,
-		interior: 1,
-		height:   2,
-	}
+	bt[-1] = r
+	bt[0] = leaf
+	return &bt
 }
 
-// 返回 B+ 树的第一个叶子节点
-func (bt *BTree) First() *leafNode {
-	return bt.first
+func(bt *BTree) Count() int {
+	count := 0
+	leaf := (*bt)[0].(*leafNode)
+	for {
+		count += leaf.countNum()
+		if leaf.next == nil {
+			break
+		}
+		leaf = leaf.next
+	}
+	return count
+}
+
+func (bt *BTree) Root() node {
+	return (*bt)[-1]
+}
+
+// 返回 第一个叶子结点
+func (bt *BTree) First() node {
+	return (*bt)[0]
+}
+
+func (bt *BTree) Values() []node {
+	nodes := make([]node, 0)
+	leaf := (*bt)[0].(*leafNode)
+	for {
+		nodes = append(nodes, leaf)
+		if leaf.next == nil {
+			break
+		}
+		leaf = leaf.next
+	}
+
+	return nodes
 }
 
 // 在 B+ 树中，插入 key-value
 func (bt *BTree) Insert(key int, value string) {
 	// 确定插入的位置，是一个叶子节点
-	_, oldIndex, leaf := search(bt.root, key)
+	_, oldIndex, leaf := search((*bt)[-1], key)
 	// 获取叶子节点的父亲节点，中间节点
 	p := leaf.parent()
 	// 插入叶子节点，返回是否分裂
-	mid, bump := leaf.insert(key, value)
+	mid, nextLeaf, bump := leaf.insert(key, value)
 	// 未分裂，则直接返回
 	if !bump {
 		return
 	}
+
+	// 填充分裂的节点到 map
+	(*bt)[mid] = nextLeaf
+
 	// 分裂则继续插入中间节点
 	var midNode node
 	midNode = leaf
@@ -66,6 +96,8 @@ func (bt *BTree) Insert(key int, value string) {
 		if !bump {
 			return
 		}
+		// 填充 map
+		(*bt)[newNode.kcs[0].key] = newNode
 
 		if !isRoot {
 			// 未到达根节点，将元素插入父亲节点，基本过程同上
@@ -74,11 +106,15 @@ func (bt *BTree) Insert(key int, value string) {
 
 			midNode = interior
 		} else {
+			// 更新 map 中的 root 节点
+			(*bt)[interior.kcs[0].key] = (*bt)[-1]
 			// 到达根节点，根节点上移，并插入原始中间节点
-			bt.root = newInteriorNode(nil, newNode)
-			newNode.setParent(bt.root)
+			(*bt)[-1] = newInteriorNode(nil, newNode)
+			node := (*bt)[-1].(*interiorNode)
+			node.insert(mid, interior)
+			(*bt)[-1] = node
+			newNode.setParent(node)
 
-			bt.root.insert(mid, interior)
 			return
 		}
 		// 赋值，获取该中间节点的父亲节点和其父亲的父节点
@@ -88,7 +124,7 @@ func (bt *BTree) Insert(key int, value string) {
 
 // 搜索： 找到，则返回 value ，否则返回空value
 func (bt *BTree) Search(key int) (string, bool) {
-	kv, _, _ := search(bt.root, key)
+	kv, _, _ := search((*bt)[-1], key)
 	if kv == nil {
 		return "", false
 	}

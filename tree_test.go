@@ -9,13 +9,14 @@ import (
 func TestInsert(t *testing.T) {
 	testCount := 1000000
 	bt := newBTree()
-
 	start := time.Now()
 	for i := testCount; i > 0; i-- {
 		bt.Insert(i, "")
 	}
+	if bt.Count() != testCount {
+		t.Error(bt.Count())
+	}
 	fmt.Println(time.Now().Sub(start))
-
 	verifyTree(bt, testCount, t)
 }
 
@@ -43,14 +44,14 @@ func TestSearch(t *testing.T) {
 func verifyTree(b *BTree, count int, t *testing.T) {
 	verifyRoot(b, t)
 
-	for i := 0; i < b.root.count; i++ {
-		verifyNode(b.root.kcs[i].child, b.root, t)
+	for i := 0; i < b.Root().countNum(); i++ {
+		verifyNode(b.Root().(*interiorNode).kcs[i].child, b.Root().(*interiorNode), t)
 	}
 
-	leftMost := findLeftMost(b.root)
+	leftMost := findLeftMost(b.Root())
 
-	if leftMost != b.first {
-		t.Errorf("bt.first: want = %p, got = %p", b.first, leftMost)
+	if leftMost != b.First() {
+		t.Errorf("bt.first: want = %p, got = %p", b.First(), leftMost)
 	}
 
 	verifyLeaf(leftMost, count, t)
@@ -59,28 +60,28 @@ func verifyTree(b *BTree, count int, t *testing.T) {
 // min child: 1
 // max child: MaxKC
 func verifyRoot(b *BTree, t *testing.T) {
-	if b.root.parent() != nil {
-		t.Errorf("root.parent: want = nil, got = %p", b.root.parent())
+	if b.Root().parent() != nil {
+		t.Errorf("Root().parent: want = nil, got = %p", b.Root().parent())
 	}
 
-	if b.root.count < 1 {
-		t.Errorf("root.min.child: want >=1, got = %d", b.root.count)
+	if b.Root().countNum() < 1 {
+		t.Errorf("Root().min.child: want >=1, got = %d", b.Root().countNum())
 	}
 
-	if b.root.count > MaxKC {
-		t.Errorf("root.max.child: want <= %d, got = %d", MaxKC, b.root.count)
+	if b.Root().countNum() > MaxKC {
+		t.Errorf("Root().max.child: want <= %d, got = %d", MaxKC, b.Root().countNum())
 	}
 }
 
 func verifyNode(n node, parent *interiorNode, t *testing.T) {
 	switch nn := n.(type) {
 	case *interiorNode:
-		if nn.count < MaxKC/2 {
-			t.Errorf("interior.min.child: want >= %d, got = %d", MaxKC/2, nn.count)
+		if nn.countNum() < MaxKC/2 {
+			t.Errorf("interior.min.child: want >= %d, got = %d", MaxKC/2, nn.countNum())
 		}
 
-		if nn.count > MaxKC {
-			t.Errorf("interior.max.child: want <= %d, got = %d", MaxKC, nn.count)
+		if nn.countNum() > MaxKC {
+			t.Errorf("interior.max.child: want <= %d, got = %d", MaxKC, nn.countNum())
 		}
 
 		if nn.parent() != parent {
@@ -88,14 +89,14 @@ func verifyNode(n node, parent *interiorNode, t *testing.T) {
 		}
 
 		var last int
-		for i := 0; i < nn.count; i++ {
+		for i := 0; i < nn.countNum(); i++ {
 			key := nn.kcs[i].key
 			if key != 0 && key < last {
 				t.Errorf("interior.sort.key: want > %d, got = %d", last, key)
 			}
 			last = key
 
-			if i == nn.count-1 && key != 0 {
+			if i == nn.countNum()-1 && key != 0 {
 				t.Errorf("interior.last.key: want = 0, got = %d", key)
 			}
 
@@ -107,12 +108,12 @@ func verifyNode(n node, parent *interiorNode, t *testing.T) {
 			t.Errorf("leaf.parent: want = %p, got = %p", parent, nn.parent())
 		}
 
-		if nn.count < MaxKV/2 {
-			t.Errorf("leaf.min.child: want >= %d, got = %d", MaxKV/2, nn.count)
+		if nn.countNum() < MaxKV/2 {
+			t.Errorf("leaf.min.child: want >= %d, got = %d", MaxKV/2, nn.countNum())
 		}
 
-		if nn.count > MaxKV {
-			t.Errorf("leaf.max.child: want <= %d, got = %d", MaxKV, nn.count)
+		if nn.countNum() > MaxKV {
+			t.Errorf("leaf.max.child: want <= %d, got = %d", MaxKV, nn.countNum())
 		}
 	}
 }
@@ -123,7 +124,7 @@ func verifyLeaf(leftMost *leafNode, count int, t *testing.T) {
 	c := 0
 
 	for curr != nil {
-		for i := 0; i < curr.count; i++ {
+		for i := 0; i < curr.countNum(); i++ {
 			key := curr.kvs[i].key
 
 			if key <= last {

@@ -17,4 +17,6 @@ type node interface {
 	setParent(*interiorNode)
 	// 是否达到最大数目限制
 	full() bool
+	// 元素数目统计	
+	countNum() int
 }
