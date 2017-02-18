@@ -27,7 +27,7 @@
 ```
 ### 核心接口定义
 ```
-	// 接口设计
+	// node 接口设计
 	type node interface {
 		// 确定元素在节点中的位置
 		find(key int) (int, bool)
@@ -39,7 +39,22 @@
 		full() bool
 		// 元素数目统计	
 		countNum() int
-}
+	}
+	// Tree API
+	// 创建自由一个父亲节点和叶子节点的 B+ 树
+	func NewBTree() *BTree 
+	// 返回 B+ Tree 存储的元素数目
+	func (bt *BTree) Count() int 
+	// 返回根结点
+	func (bt *BTree) Root() node 
+	// 返回最左侧叶子结点
+	func (bt *BTree) First() node 
+	// 返回由叶子结点指针构成的数组，从最左侧开始依次追加
+	func (bt *BTree) Values() []*leafNode
+	// 在 B+ 树中，插入 key-value
+	func (bt *BTree) Insert(key int, value string)
+	// 搜索： 找到，则返回 value ，否则返回空value
+	func (bt *BTree) Search(key int) (string, bool) 
 
 ```
 

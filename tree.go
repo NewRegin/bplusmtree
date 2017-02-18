@@ -16,6 +16,7 @@ func NewBTree() *BTree {
 	return &bt
 }
 
+// 返回 B+ Tree 存储的元素数目
 func (bt *BTree) Count() int {
 	count := 0
 	leaf := (*bt)[0].(*leafNode)
@@ -29,6 +30,7 @@ func (bt *BTree) Count() int {
 	return count
 }
 
+// 返回根结点
 func (bt *BTree) Root() node {
 	return (*bt)[-1]
 }
@@ -38,6 +40,7 @@ func (bt *BTree) First() node {
 	return (*bt)[0]
 }
 
+// 返回由叶子结点指针构成的数组，从最左侧开始依次追加
 func (bt *BTree) Values() []*leafNode {
 	nodes := make([]*leafNode, 0)
 	leaf := (*bt)[0].(*leafNode)
