@@ -8,9 +8,9 @@ import (
 
 func TestInsert(t *testing.T) {
 	testCount := 1000000
-	bt := newBTree()
+	bt := NewBTree()
 	start := time.Now()
-	for i := testCount; i > 0; i-- {
+	for i := 1; i <= testCount; i++ {
 		bt.Insert(i, "")
 	}
 	if bt.Count() != testCount {
@@ -22,7 +22,7 @@ func TestInsert(t *testing.T) {
 
 func TestSearch(t *testing.T) {
 	testCount := 1000000
-	bt := newBTree()
+	bt := NewBTree()
 
 	for i := testCount; i > 0; i-- {
 		bt.Insert(i, fmt.Sprintf("%d", i))

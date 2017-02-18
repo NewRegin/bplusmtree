@@ -19,9 +19,9 @@ func (a *kvs) Less(i, j int) bool { return a[i].key < a[j].key }
 
 // 叶子节点的数据结构
 type leafNode struct {
-	kvs   kvs // 存储元素
-	count int // 实际存储元素数目
-	next  *leafNode // 右边第一个叶子节点（右指针）
+	kvs   kvs           // 存储元素
+	count int           // 实际存储元素数目
+	next  *leafNode     // 右边第一个叶子节点（右指针）
 	p     *interiorNode // 父亲节点，中间节点
 }
 
@@ -80,6 +80,8 @@ func (l *leafNode) split() *leafNode {
 	next := newLeafNode(nil)
 	// 将原始节点的右半部分复制过去
 	copy(next.kvs[0:], l.kvs[l.count/2+1:])
+	// 初始化原始节点的右半部分
+	l.initArray(l.count/2 + 1)
 	// 设置右节点的参数
 	next.count = MaxKV - l.count/2 - 1
 	next.next = l.next
@@ -91,12 +93,22 @@ func (l *leafNode) split() *leafNode {
 	// 返回右节点指针
 	return next
 }
+
 // 判断是否达到 key 数目上限 MaxKV
 func (l *leafNode) full() bool { return l.count == MaxKV }
+
 // 返回父节点，中间节点
 func (l *leafNode) parent() *interiorNode { return l.p }
+
 // 设置父中间节点
 func (l *leafNode) setParent(p *interiorNode) { l.p = p }
 
+// 获取叶子结点存储的元素数目
 func (l *leafNode) countNum() int { return l.count }
 
+// 初始化数组从 num 起的元素为空结构
+func (l *leafNode) initArray(num int) {
+	for i := num; i < len(l.kvs); i++ {
+		l.kvs[i] = kv{}
+	}
+}

@@ -3,4 +3,7 @@ VERSION 0.1.0
 
 VERSION 0.2.0
 *[refactor] B+ 树结构封装在 map 里
- *[feature] 实现有序扫描
+*[feature] 实现有序扫描
+
+VERSION 0.3.0
+*[fix bug] 修正分裂节点时原始节点右半部分未晴空清空的错误

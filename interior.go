@@ -3,6 +3,7 @@ package bplusmtree
 import (
 	"sort"
 )
+
 // Value 定义
 type kc struct {
 	key   int
@@ -28,10 +29,11 @@ func (a *kcs) Less(i, j int) bool {
 
 	return a[i].key < a[j].key
 }
+
 // 中间节点数据结构定义
 type interiorNode struct {
-	kcs   kcs // 存储元素
-	count int // 实际存储元素数目
+	kcs   kcs           // 存储元素
+	count int           // 实际存储元素数目
 	p     *interiorNode // 父亲节点
 }
 
@@ -47,8 +49,6 @@ func newInteriorNode(p *interiorNode, largestChild node) *interiorNode {
 	return i
 }
 
-
-
 // 从该中间节点找到 key 元素应该存储的位置
 func (in *interiorNode) find(key int) (int, bool) {
 	// 定义查询方法，这里只需要 ">"
@@ -58,15 +58,6 @@ func (in *interiorNode) find(key int) (int, bool) {
 
 	return i, true
 }
-// 判断是否达到中间节点的最大元素数目限制 MaxKC
-func (in *interiorNode) full() bool { return in.count == MaxKC }
-// 返回中间节点的父亲节点
-func (in *interiorNode) parent() *interiorNode { return in.p }
-// 设置中间节点的父亲节点
-func (in *interiorNode) setParent(p *interiorNode) { in.p = p }
-
-func (in *interiorNode) countNum() int { return in.count }
-
 
 // 插入中间节点
 func (in *interiorNode) insert(key int, child node) (int, *interiorNode, bool) {
@@ -110,6 +101,8 @@ func (in *interiorNode) split() (*interiorNode, int) {
 	next := newInteriorNode(nil, nil)
 	// 将中间元素的右侧数组拷贝到新的分裂节点
 	copy(next.kcs[0:], in.kcs[midIndex+1:])
+	// 初始化原始节点的右半部分
+	in.initArray(midIndex + 1)
 	// 设置分裂节点的 Count
 	next.count = MaxKC - midIndex
 	// 更新分裂节点中所有元素子节点的父亲节点
@@ -124,4 +117,23 @@ func (in *interiorNode) split() (*interiorNode, int) {
 	midChild.setParent(in)
 	// 返回分裂后产生的中间节点和中间元素的 key，供父亲节点插入
 	return next, midKey
+}
+
+// 判断是否达到中间节点的最大元素数目限制 MaxKC
+func (in *interiorNode) full() bool { return in.count == MaxKC }
+
+// 返回中间节点的父亲节点
+func (in *interiorNode) parent() *interiorNode { return in.p }
+
+// 设置中间节点的父亲节点
+func (in *interiorNode) setParent(p *interiorNode) { in.p = p }
+
+// 获取中间结点存储的元素数目
+func (in *interiorNode) countNum() int { return in.count }
+
+// 初始化数组从 num 起的元素为空结构
+func (in *interiorNode) initArray(num int) {
+	for i := num; i < len(in.kcs); i++ {
+		in.kcs[i] = kc{}
+	}
 }

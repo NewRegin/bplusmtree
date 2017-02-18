@@ -1,14 +1,12 @@
 package bplusmtree
 
-import (
-)
+import ()
 
 // B+ 树数据结构；限制只能存储正数
 type BTree map[int]node
 
-
 // 创建自由一个父亲节点和叶子节点的 B+ 树
-func newBTree() *BTree {
+func NewBTree() *BTree {
 	bt := BTree{}
 	leaf := newLeafNode(nil)
 	r := newInteriorNode(nil, leaf)
@@ -18,7 +16,7 @@ func newBTree() *BTree {
 	return &bt
 }
 
-func(bt *BTree) Count() int {
+func (bt *BTree) Count() int {
 	count := 0
 	leaf := (*bt)[0].(*leafNode)
 	for {
@@ -40,8 +38,8 @@ func (bt *BTree) First() node {
 	return (*bt)[0]
 }
 
-func (bt *BTree) Values() []node {
-	nodes := make([]node, 0)
+func (bt *BTree) Values() []*leafNode {
+	nodes := make([]*leafNode, 0)
 	leaf := (*bt)[0].(*leafNode)
 	for {
 		nodes = append(nodes, leaf)
