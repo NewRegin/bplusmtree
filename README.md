@@ -57,5 +57,13 @@
 	func (bt *BTree) Search(key int) (string, bool) 
 
 ```
+### 进阶
+```
+	1. parent 指针：包含了指向parent的指针，每次分裂要修改大量子节点的父指针（可以考虑 Stack 解决向上递归的问题） 
+	2. 支持高并发修改和查询，但是锁的粒度要小，仅限于相关的页面／节点级别（考虑到并发场景下的节点分裂，Stack 里面可能也需要检查右指针）
+	3. 排序算法向上暴露
+	4. Key 和 Value 数据类型是 Interface
+	5. 阅读 Pgsql 的 Readme 文档和两篇关键论文（google pgsql/src/backend/access/nbtree/README）
+```
 
 <!--### 与普通实现方案的对比-->
